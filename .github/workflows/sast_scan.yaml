@@ -1,0 +1,19 @@
+name: SAST Scan
+
+on:
+    workflow_dispatch:
+
+jobs:
+    semgrep:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4.1.6
+       
+          - name: Run SemGrep Scan
+            run: |
+              docker run --rm -v "${PWD}:/src" semgrep/semgrep semgrep scan --output semgrep-report.json --json
+                  
+          - name: Run PolGate
+            run: |
+              ./polgate eval --input semgrep-report.json --policy semgrep_pass_all
